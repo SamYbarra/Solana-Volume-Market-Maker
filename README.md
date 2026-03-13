@@ -1,39 +1,45 @@
-# Pumpfun Market Maker Bot
+# Solana Volume Market Maker Bot
 
-An automated market maker bot for Pumpfun tokens on Solana blockchain. This bot simulates real trader behavior with randomized trade sizes, timing, and multi-wallet support.
+A sophisticated volume market maker bot for Solana DEXs using Jupiter aggregator. This bot creates organic trading patterns by using multiple wallets with randomized buy/sell intervals and amounts.
 
 ## Features
 
-- 🤖 **Automated Trading**: Buy and sell tokens automatically based on market conditions
-- 🎲 **Realistic Behavior**: Randomized trade sizes and timing to mimic human traders
-- 💼 **Multi-Wallet Support**: Distribute trades across multiple wallets
-- 📊 **Health Charts**: Visualize bot performance with real-time charts
-- ⚙️ **Configurable**: Control buy/sell volumes, market cap limits, and trading behavior
-- 📈 **Statistics**: Track trading performance and success rates
+- 🚀 **Jupiter Integration**: Trades across all Solana DEXs via Jupiter aggregator
+- 👛 **Multi-Wallet Support**: Uses multiple wallets to create organic trading patterns
+- ⏱️ **Configurable Intervals**: Random buy/sell intervals to simulate natural trading
+- 💰 **Flexible Amounts**: Random buy/sell amounts within configurable ranges
+- 🔒 **Safe & Secure**: Private keys stored securely, never exposed
+- 📊 **Real-time Trading**: Executes trades on Solana mainnet
 
 ## Prerequisites
 
-- Node.js 18+ 
-- TypeScript 5.3+
-- Solana wallet(s) with SOL balance
-- Access to Solana RPC endpoint (public or private)
+- Node.js 18+ and npm
+- Solana wallet(s) with SOL for trading
+- RPC endpoint (public or private)
 
 ## Installation
 
+1. Clone the repository:
 ```bash
-# Install dependencies
+git clone <repository-url>
+cd Solana-Volume-Market-Maker
+```
+
+2. Install dependencies:
+```bash
 npm install
+```
 
-# Copy environment file
-cp env.example .env
+3. Create a `.env` file from the example:
+```bash
+cp .env.example .env
+```
 
-# Edit .env with your configuration
+4. Configure your `.env` file (see Configuration section below)
 
-# Build TypeScript
+5. Build the project:
+```bash
 npm run build
-
-# Or run in development mode
-npm run dev:run
 ```
 
 ## Configuration
@@ -42,158 +48,186 @@ Edit the `.env` file with your settings:
 
 ### Required Settings
 
-- `WALLET_PRIVATE_KEYS`: Comma-separated list of wallet private keys (base58 or hex format)
-- `TOKEN_ADDRESS`: The Pumpfun token address to trade
+- **RPC_URL**: Your Solana RPC endpoint
+  - Public: `https://api.mainnet-beta.solana.com`
+  - Recommended: Use a private RPC (Helius, QuickNode, etc.) for better performance
+
+- **WALLET_PRIVATE_KEYS**: Comma-separated list of base58-encoded private keys
+  - Example: `key1,key2,key3`
+  - OR use **WALLET_FILE_PATH** to load from a file (one key per line)
+
+- **TOKEN_MINT_ADDRESS**: The token you want to trade (mint address)
 
 ### Trading Settings
 
-- `MIN_BUY_AMOUNT_SOL` / `MAX_BUY_AMOUNT_SOL`: Buy amount range in SOL
-- `MIN_SELL_AMOUNT_SOL` / `MAX_SELL_AMOUNT_SOL`: Sell amount range in SOL
-- `MIN_MARKET_CAP_SOL` / `MAX_MARKET_CAP_SOL`: Market cap range to trade within
+- **MIN_BUY_AMOUNT** / **MAX_BUY_AMOUNT**: SOL amount range for buys (default: 0.01 - 1.0)
+- **MIN_SELL_AMOUNT** / **MAX_SELL_AMOUNT**: Token amount range for sells (default: 0.01 - 1.0)
+- **BUY_INTERVAL_MIN** / **BUY_INTERVAL_MAX**: Buy interval range in seconds (default: 30 - 300)
+- **SELL_INTERVAL_MIN** / **SELL_INTERVAL_MAX**: Sell interval range in seconds (default: 30 - 300)
+- **SLIPPAGE_BPS**: Slippage tolerance in basis points (default: 50 = 0.5%)
+- **MAX_WALLETS_TO_USE**: Maximum number of wallets to use simultaneously (default: 5)
 
-### Behavior Settings
-
-- `MIN_TRADE_DELAY_SECONDS` / `MAX_TRADE_DELAY_SECONDS`: Delay between trades (randomized)
-- `RANDOMIZE_TRADE_SIZE`: Enable/disable trade size randomization
-- `RANDOMIZE_TRADE_TIMING`: Enable/disable trade timing randomization
-
-### Example Configuration
+### Example .env File
 
 ```env
-WALLET_PRIVATE_KEYS=5Kd3N...abc123,7Hm9P...def456
-TOKEN_ADDRESS=TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA
-MIN_BUY_AMOUNT_SOL=0.1
-MAX_BUY_AMOUNT_SOL=1.0
-MIN_MARKET_CAP_SOL=1000
-MAX_MARKET_CAP_SOL=100000
+RPC_URL=https://api.mainnet-beta.solana.com
+TOKEN_MINT_ADDRESS=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
+BASE_TOKEN_MINT_ADDRESS=So11111111111111111111111111111111111111112
+MIN_BUY_AMOUNT=0.1
+MAX_BUY_AMOUNT=2.0
+MIN_SELL_AMOUNT=0.1
+MAX_SELL_AMOUNT=2.0
+BUY_INTERVAL_MIN=60
+BUY_INTERVAL_MAX=600
+SELL_INTERVAL_MIN=60
+SELL_INTERVAL_MAX=600
+SLIPPAGE_BPS=50
+WALLET_PRIVATE_KEYS=your_key1,your_key2,your_key3
+ENABLED=true
+MAX_WALLETS_TO_USE=5
 ```
 
 ## Usage
 
+### Development Mode
+
+Run with TypeScript directly (requires `ts-node`):
 ```bash
-# Build and start the bot
-npm start
-
-# Or run in development mode (with TypeScript watch)
 npm run dev
+```
 
-# Or run directly with tsx (no build step)
-npm run dev:run
+### Production Mode
 
-# Type check without running
-npm run type-check
+Build and run:
+```bash
+npm run build
+npm start
+```
+
+### Watch Mode
+
+Auto-rebuild on changes:
+```bash
+npm run watch
 ```
 
 ## How It Works
 
-1. **Initialization**: Loads wallets and validates configuration
-2. **Market Analysis**: Checks token price and market cap
-3. **Trade Decision**: Randomly decides to buy or sell based on market conditions
-4. **Execution**: Executes trade with randomized amount and timing
-5. **Monitoring**: Updates health charts and statistics
-6. **Repeat**: Continues trading cycle with random delays
+1. **Wallet Management**: The bot loads multiple wallets from your configuration
+2. **Random Selection**: For each trade, a random wallet is selected
+3. **Interval Control**: Buy and sell operations are scheduled with random intervals
+4. **Amount Randomization**: Each trade uses a random amount within your configured range
+5. **Jupiter Integration**: All trades go through Jupiter, which routes to the best DEX
+6. **Balance Checking**: Before selling, the bot checks if the wallet has tokens
 
-## Trading Behavior
+## Trading Flow
 
-The bot is designed to act like real traders:
+### Buy Flow
+1. Random wallet selected
+2. Random SOL amount calculated (within min/max range)
+3. Jupiter quote requested
+4. Swap transaction created and signed
+5. Transaction sent to Solana network
 
-- **Randomized Trade Sizes**: Uses normal distribution around configured ranges
-- **Randomized Timing**: Varies delays between trades
-- **Multi-Wallet Rotation**: Distributes trades across multiple wallets
-- **Market Cap Filtering**: Only trades when market cap is within configured range
-
-## Health Charts
-
-Charts are generated automatically and saved to the `charts/` directory:
-
-- `health-chart-*.png`: Real-time health metrics (balance, market cap, trades)
-- `stats-chart-*.png`: Trading statistics (buy/sell counts)
-- `latest.png`: Most recent health chart
-
-## Statistics
-
-The bot tracks:
-
-- Total buys/sells
-- Success rates
-- Total volume traded
-- Current balance
-- Market cap and price
-
-Statistics are printed periodically and can be viewed in the console.
+### Sell Flow
+1. Random wallet selected
+2. Token balance checked
+3. Random token amount calculated (within min/max range, not exceeding balance)
+4. Jupiter quote requested
+5. Swap transaction created and signed
+6. Transaction sent to Solana network
 
 ## Safety Features
 
-- Market cap limits prevent trading outside configured ranges
-- Configurable buy/sell enable flags
-- Graceful shutdown on SIGINT/SIGTERM
-- Error handling and logging
+- ✅ Wallet busy detection (prevents concurrent trades on same wallet)
+- ✅ Balance validation before selling
+- ✅ Transaction confirmation waiting
+- ✅ Error handling and logging
+- ✅ Graceful shutdown on SIGINT/SIGTERM
 
-## Important Notes
+## Monitoring
 
-⚠️ **Disclaimer**: This bot is for educational purposes. Trading cryptocurrencies involves risk. Use at your own discretion.
-
-⚠️ **Pumpfun Integration**: The current implementation includes placeholder Pumpfun program interactions. You'll need to:
-
-1. Update `PUMPFUN_PROGRAM_ID` in `src/pumpfun.js` with the actual program ID
-2. Implement the correct instruction data format for Pumpfun buy/sell operations
-3. Verify the API endpoints for price/market cap data
-
-⚠️ **RPC Limits**: Public RPC endpoints have rate limits. Consider using a private RPC endpoint for production use.
+The bot logs all activities to the console:
+- Wallet addresses (truncated for privacy)
+- Trade amounts
+- Transaction signatures
+- Errors and warnings
 
 ## Troubleshooting
 
-### "No wallet private keys configured"
-- Ensure `WALLET_PRIVATE_KEYS` is set in `.env`
-- Check that private keys are comma-separated
+### "No wallets loaded" Error
+- Ensure `WALLET_PRIVATE_KEYS` or `WALLET_FILE_PATH` is set correctly
+- Verify private keys are base58-encoded
+- Check that keys are valid Solana private keys
 
-### "Token address not configured"
-- Set `TOKEN_ADDRESS` in `.env` file
+### Transaction Failures
+- Ensure wallets have sufficient SOL for fees
+- Check token mint address is correct
+- Verify RPC endpoint is working
+- Increase slippage tolerance if needed
 
-### "Insufficient balance"
-- Ensure wallets have enough SOL for trading and transaction fees
+### RPC Rate Limiting
+- Use a private RPC endpoint for better rate limits
+- Consider reducing trading frequency
+- Monitor RPC usage
 
-### Chart generation errors
-- Ensure `charts/` directory exists or is writable
-- Check that `chartjs-node-canvas` dependencies are installed
+## Security Best Practices
 
-## Development
+1. **Never commit `.env` file** - It's already in `.gitignore`
+2. **Use separate trading wallets** - Don't use your main wallet
+3. **Start with small amounts** - Test with minimal amounts first
+4. **Monitor transactions** - Check Solana Explorer regularly
+5. **Use private RPC** - Public RPCs have rate limits
 
-### Project Structure
+## Project Structure
 
 ```
 .
 ├── src/
-│   ├── index.ts          # Main bot entry point
-│   ├── config.ts         # Configuration management
-│   ├── wallet.ts         # Wallet management
-│   ├── pumpfun.ts       # Pumpfun trading logic
-│   ├── trading.ts        # Trading engine
-│   ├── chart.ts          # Chart generation
-│   ├── utils.ts          # Utility functions
-│   └── types.ts          # TypeScript type definitions
-├── dist/                 # Compiled JavaScript (generated)
-├── charts/               # Generated charts
-├── .env                 # Environment variables (not in git)
-├── .env.example         # Example environment file
-├── .gitignore
-├── tsconfig.json        # TypeScript configuration
-├── package.json
-└── README.md
+│   ├── bot/
+│   │   └── marketMaker.ts      # Main bot logic
+│   ├── config/
+│   │   └── index.ts            # Configuration loader
+│   ├── services/
+│   │   └── jupiter.ts          # Jupiter API integration
+│   ├── types/
+│   │   └── config.ts           # TypeScript types
+│   ├── utils/
+│   │   ├── random.ts           # Random number utilities
+│   │   └── wallet.ts           # Wallet management
+│   └── index.ts                # Entry point
+├── .env.example                # Example environment file
+├── .gitignore                  # Git ignore rules
+├── package.json                # Dependencies
+├── tsconfig.json              # TypeScript config
+└── README.md                  # This file
 ```
+
+## Dependencies
+
+- `@solana/web3.js`: Solana blockchain interaction
+- `axios`: HTTP client for Jupiter API
+- `bs58`: Base58 encoding/decoding for keys
+- `dotenv`: Environment variable management
 
 ## License
 
-MIT License - Use at your own risk
+MIT
 
-## Contributing
+## Disclaimer
 
-Contributions welcome! Please ensure:
-
-1. Code follows existing style
-2. Tests pass (if applicable)
-3. Documentation is updated
+This bot is for educational and research purposes. Trading cryptocurrencies involves risk. Use at your own discretion. The authors are not responsible for any financial losses.
 
 ## Support
 
-For issues and questions, please open an issue on the repository.
+For issues and questions:
+1. Check the troubleshooting section
+2. Review Solana and Jupiter documentation
+3. Verify your configuration matches the examples
+
+## Contributing
+
+Contributions are welcome! Please ensure:
+- Code follows TypeScript best practices
+- All new features are tested
+- Documentation is updated
